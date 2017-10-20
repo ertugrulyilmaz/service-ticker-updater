@@ -16,21 +16,32 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 trait Liqui extends BaseMarket {
 
-  val url = "https://api.livecoin.net/exchange/ticker"
+  val pairsUrl = "https://api.liqui.io/api/3/info"
+  val tickerUrl = "https://api.liqui.io/api/3/ticker"
 
   override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
-    HttpClientFactory.get(httpClient, url).map { res =>
+    val res = HttpClientFactory.completedGet(httpClient, pairsUrl)
+    val pairs = parse(res.getResponseBody)
+      .values
+      .asInstanceOf[Map[String, Map[String, Any]]]("pairs")
+      .keys
+      .filter(_.endsWith("_btc"))
+      .toSeq
+      .mkString("-")
+
+    HttpClientFactory.get(httpClient, s"$tickerUrl/$pairs").map { res =>
       parse(res.getResponseBody)
-        .values.asInstanceOf[List[Map[String, Any]]]
-        .map { pair =>
-          val assetCurrency = pair("symbol").toString.toLowerCase.split("/")
+        .values.asInstanceOf[Map[String, Map[String, Double]]]
+        .map { data =>
+          val pair = data._1
+          val assetCurrency = pair.split("_")
           val asset = reformatCurrencyName(assetCurrency.head)
           val currency = reformatCurrencyName(assetCurrency.last)
-          val volume = pair("volume").toString
-          val lastPrice = pair("last").toString
+          val volume = data._2.getOrElse("vol", 0.0)
+          val lastPrice = data._2.getOrElse("last", 0.0)
 
-          CoinTicker("liqui", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
-        }
+          CoinTicker("liqui", CoinPair(asset, currency, pair), BigDecimal(volume), BigDecimal(lastPrice))
+        }.toList
     }
   }
 

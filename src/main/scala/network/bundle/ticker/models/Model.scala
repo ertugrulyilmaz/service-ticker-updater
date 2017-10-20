@@ -7,7 +7,7 @@ object Model {
 
   case class Market(market: BaseMarket)
 
-  case class CoinPair(asset: String, currency: String) {
+  case class CoinPair(asset: String, currency: String, market: String = "") {
     def name: String = s"$asset-$currency"
   }
 

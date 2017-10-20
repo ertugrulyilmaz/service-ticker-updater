@@ -1,6 +1,5 @@
 package network.bundle.ticker
 
-import java.sql.Date
 import java.util.Calendar
 
 import akka.actor.ActorSystem
@@ -10,8 +9,7 @@ import com.typesafe.scalalogging.StrictLogging
 import network.bundle.ticker.actors.CoinActor
 import network.bundle.ticker.async.HttpClientFactory
 import network.bundle.ticker.datasources.MysqlDataSource
-import network.bundle.ticker.markets.b.{Binance, Bittirex}
-import network.bundle.ticker.markets.c.Cryptopia
+import network.bundle.ticker.markets.b.{Binance, Bitfinex, Bittirex}
 import network.bundle.ticker.markets.g.Gemini
 import network.bundle.ticker.markets.h.Hitbtc
 import network.bundle.ticker.markets.k.Kraken
@@ -54,16 +52,16 @@ object Main extends App with StrictLogging {
   }
 
   val markets = immutable.Seq(
+    Market(Poloniex(httpClient)),
+    Market(Binance(httpClient)),
     Market(Liqui(httpClient)),
     Market(Kraken(httpClient)),
     Market(Hitbtc(httpClient)),
     Market(Bittirex(httpClient)),
-    Market(Binance(httpClient)),
-    Market(Cryptopia(httpClient)),
     Market(Gemini(httpClient)),
+    Market(Bitfinex(httpClient)),
     Market(NovaExchange(httpClient)),
-    Market(Yobit(httpClient)),
-    Market(Poloniex(httpClient))
+    Market(Yobit(httpClient))
   )
 
   Source(markets)
@@ -77,7 +75,7 @@ object Main extends App with StrictLogging {
           .foreach { data =>
             val assetCurrency = data._1.split("-")
 
-            coinActor ! Coin(assetCurrency.head, data._2, new Date(Calendar.getInstance().getTimeInMillis))
+            coinActor ! Coin(assetCurrency.head, data._2, Calendar.getInstance().getTimeInMillis)
           }
       case Failure(cause) =>
         logger.error("Failed", cause)

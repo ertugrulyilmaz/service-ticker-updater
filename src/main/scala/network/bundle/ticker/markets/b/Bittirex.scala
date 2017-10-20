@@ -31,7 +31,7 @@ trait Bittirex extends BaseMarket {
           val volume = pair("Volume").toString
           val lastPrice = pair("Last").toString
 
-          CoinTicker("bittirex", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker("bittirex", CoinPair(asset, currency, pair("MarketName").toString), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }

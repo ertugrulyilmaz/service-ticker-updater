@@ -19,9 +19,9 @@ trait Gemini extends BaseMarket {
 
   val url = ""
   val tickers = immutable.Seq(
-    Tickers(CoinPair("btc", "usd"), "https://api.gemini.com/v1/pubticker/btcusd"),
-    Tickers(CoinPair("eth", "btc"), "https://api.gemini.com/v1/pubticker/ethbtc"),
-    Tickers(CoinPair("eth", "usd"), "https://api.gemini.com/v1/pubticker/ethusd")
+    Tickers(CoinPair("btc", "usd", "btcusd"), "https://api.gemini.com/v1/pubticker/btcusd"),
+    Tickers(CoinPair("eth", "btc", "ethbtc"), "https://api.gemini.com/v1/pubticker/ethbtc"),
+    Tickers(CoinPair("eth", "usd", "ethusd"), "https://api.gemini.com/v1/pubticker/ethusd")
   )
 
   override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {

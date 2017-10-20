@@ -49,14 +49,14 @@ trait Kraken extends BaseMarket {
           .asInstanceOf[Map[String, Map[String, Map[String, Seq[String]]]]]("result")
           .values match {
           case data if data.isEmpty =>
-            CoinTicker("kraken", CoinPair("empty", "empty"), zero, zero)
+            CoinTicker("kraken", CoinPair("empty", "empty", "empty"), zero, zero)
           case data =>
             val volume = data.head("v").last
             val lastPrice = data.head("p").last
             val asset = reformatCurrencyName(base.toLowerCase)
             val currency = reformatCurrencyName(quote.toLowerCase)
 
-            CoinTicker("kraken", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+            CoinTicker("kraken", CoinPair(asset, currency, altname), BigDecimal(volume), BigDecimal(lastPrice))
         }
       }
     }

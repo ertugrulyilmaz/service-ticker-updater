@@ -27,10 +27,10 @@ trait Hitbtc extends BaseMarket {
         .asInstanceOf[Map[String, Map[String, String]]]
         .map { ticker =>
           val coinPair = ticker._1 match {
-            case x if x.contains("BTC") => CoinPair(x.replace("BTC", "").toLowerCase, "btc")
-            case x if x.contains("USD") => CoinPair(x.replace("USD", "").toLowerCase, "usd")
-            case x if x.contains("EUR") => CoinPair(x.replace("EUR", "").toLowerCase, "eur")
-            case x if x.contains("ETH") => CoinPair(x.replace("ETH", "").toLowerCase, "eth")
+            case x if x.contains("BTC") => CoinPair(x.replace("BTC", "").toLowerCase, "btc", x)
+            case x if x.contains("USD") => CoinPair(x.replace("USD", "").toLowerCase, "usd", x)
+            case x if x.contains("EUR") => CoinPair(x.replace("EUR", "").toLowerCase, "eur", x)
+            case x if x.contains("ETH") => CoinPair(x.replace("ETH", "").toLowerCase, "eth", x)
           }
 
           val volume = ticker._2("volume_quote")

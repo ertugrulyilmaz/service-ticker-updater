@@ -21,16 +21,28 @@ import scala.concurrent.{ExecutionContext, Future}
 trait Bitfinex extends BaseMarket {
 
   val baseUrl: String = "https://api.bitfinex.com/v1/pubticker"
-  val coinPairs: immutable.Seq[CoinPair] = immutable.Seq(CoinPair("btc", "usd"), CoinPair("ltc", "usd"), CoinPair("ltc", "btc"),
-    CoinPair("eth", "usd"), CoinPair("eth", "btc"), CoinPair("etc", "btc"), CoinPair("etc", "usd"),
-    CoinPair("rrt", "usd"), CoinPair("rrt", "btc"), CoinPair("zec", "usd"), CoinPair("zec", "btc"),
-    CoinPair("xmr", "usd"), CoinPair("xmr", "btc"), CoinPair("dsh", "usd"), CoinPair("dsh", "btc"),
-    CoinPair("bcc", "btc"), CoinPair("bcu", "btc"), CoinPair("bcc", "usd"), CoinPair("bcu", "usd"),
-    CoinPair("xrp", "usd"), CoinPair("xrp", "btc"), CoinPair("iot", "usd"), CoinPair("iot", "btc"),
-    CoinPair("iot", "eth"), CoinPair("eos", "usd"), CoinPair("eos", "btc"), CoinPair("eos", "eth"),
-    CoinPair("san", "usd"), CoinPair("san", "btc"), CoinPair("san", "eth"), CoinPair("omg", "usd"),
-    CoinPair("omg", "btc"), CoinPair("omg", "eth"), CoinPair("bch", "usd"), CoinPair("bch", "btc"),
-    CoinPair("bch", "eth"))
+  val coinPairs: immutable.Seq[CoinPair] = immutable.Seq(
+    CoinPair("btc", "usd", "btcusd"),
+    CoinPair("ltc", "usd", "ltcusd"), CoinPair("ltc", "btc", "ltcbtc"),
+    CoinPair("eth", "usd", "ethusd"), CoinPair("eth", "btc", "ethbtc"),
+    CoinPair("etc", "btc", "etcbtc"), CoinPair("etc", "usd", "etcusd"),
+    CoinPair("rrt", "usd", "rrtusd"), CoinPair("rrt", "btc", "rrtbtc"),
+    CoinPair("zec", "usd", "zecusd"), CoinPair("zec", "btc", "zecbtc"),
+    CoinPair("xmr", "usd", "xmrusd"), CoinPair("xmr", "btc", "xmrbtc"),
+    CoinPair("dsh", "usd", "dshusd"), CoinPair("dsh", "btc", "dshbtc"),
+    CoinPair("bcc", "btc", "bccbtc"), CoinPair("bcc", "usd", "bccusd"),
+    CoinPair("bcu", "btc", "bcubtc"), CoinPair("bcu", "usd", "bcuusd"),
+    CoinPair("xrp", "usd", "xrpusd"), CoinPair("xrp", "btc", "xrpbtc"),
+    CoinPair("iot", "usd", "iotusd"), CoinPair("iot", "btc", "iotbtc"), CoinPair("iot", "eth", "ioteth"),
+    CoinPair("eos", "usd", "eosusd"), CoinPair("eos", "btc", "eosbtc"), CoinPair("eos", "eth", "eoseth"),
+    CoinPair("san", "usd", "sanusd"), CoinPair("san", "btc", "sanbtc"), CoinPair("san", "eth", "saneth"),
+    CoinPair("omg", "usd", "omgusd"), CoinPair("omg", "btc", "omgbtc"), CoinPair("omg", "eth", "omgeth"),
+    CoinPair("bch", "usd", "bchusd"), CoinPair("bch", "btc", "bchbtc"), CoinPair("bch", "eth", "bcheth"),
+    CoinPair("neo", "usd", "neousd"), CoinPair("neo", "btc", "neobtc"), CoinPair("neo", "eth", "neoeth"),
+    CoinPair("etp", "usd", "etpusd"), CoinPair("etp", "btc", "etpbtc"), CoinPair("etp", "eth", "etpeth"),
+    CoinPair("qtm", "usd", "qtmusd"), CoinPair("qtm", "btc", "qtmbtc"), CoinPair("qtm", "eth", "qtmeth"),
+    CoinPair("avt", "usd", "avtusd"), CoinPair("avt", "btc", "avtbtc"), CoinPair("avt", "eth", "avteth")
+  ).filter(_.currency == "btc")
 
   override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(coinPairs) { coinPair =>

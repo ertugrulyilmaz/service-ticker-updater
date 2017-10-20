@@ -29,7 +29,7 @@ trait Poloniex extends BaseMarket {
         val volume = data._2("quoteVolume")
         val lastPrice = data._2("last")
 
-        CoinTicker("poloniex", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker("poloniex", CoinPair(asset, currency, data._1), BigDecimal(volume), BigDecimal(lastPrice))
       }.to[immutable.Seq]
     }
   }

@@ -8,7 +8,7 @@ import slick.jdbc.MySQLProfile.api._
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-trait ExchangeRepository extends StrictLogging {
+trait ExchangeCoinRepository extends StrictLogging {
 
   val dataSource: MysqlDataSource
 
@@ -16,10 +16,11 @@ trait ExchangeRepository extends StrictLogging {
     val insertAction =
       sqlu"""
          INSERT INTO exchange_coin
-             (exchange, asset, currency, price, volume, updated_at)
+             (exchange, market, asset, currency, price, volume, updated_at)
          VALUES
              (
               ${exchangeCoin.exchange},
+              ${exchangeCoin.market},
               ${exchangeCoin.asset},
               ${exchangeCoin.currency},
               ${exchangeCoin.price},
@@ -27,6 +28,7 @@ trait ExchangeRepository extends StrictLogging {
               ${exchangeCoin.updatedAt}
           )
           ON DUPLICATE KEY UPDATE
+             market = ${exchangeCoin.market},
              price = ${exchangeCoin.price},
              volume = ${exchangeCoin.volume},
              updated_at = ${exchangeCoin.updatedAt}
@@ -41,9 +43,9 @@ trait ExchangeRepository extends StrictLogging {
 
 }
 
-object ExchangeRepository {
+object ExchangeCoinRepository {
 
-  def apply(_dataSource: MysqlDataSource): ExchangeRepository = new ExchangeRepository() {
+  def apply(_dataSource: MysqlDataSource): ExchangeCoinRepository = new ExchangeCoinRepository() {
     override val dataSource: MysqlDataSource = _dataSource
   }
 

@@ -38,7 +38,7 @@ trait Yobit extends BaseMarket {
         val volume = data("vol_cur").toString
         val lastPrice = data("last").toString
 
-        CoinTicker("yobit", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker("yobit", CoinPair(asset, currency, pairs), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }
