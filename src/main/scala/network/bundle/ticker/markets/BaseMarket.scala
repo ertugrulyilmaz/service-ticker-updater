@@ -9,6 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseMarket extends StrictLogging {
 
+  def id: Long = 0L
+
   val zero = BigDecimal(0.0)
 
   val httpClient: AsyncHttpClient

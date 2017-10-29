@@ -62,6 +62,7 @@ object Bitfinex {
 
   def apply(hc: AsyncHttpClient): Bitfinex = new Bitfinex() {
 
+    override val id = 2L
     override val httpClient: AsyncHttpClient = hc
 
   }

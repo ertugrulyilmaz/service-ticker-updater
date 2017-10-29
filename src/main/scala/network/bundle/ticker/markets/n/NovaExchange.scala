@@ -24,7 +24,7 @@ trait NovaExchange extends BaseMarket {
           val volume = pair("volume24h").toString
           val lastPrice = pair("last_price").toString
 
-          CoinTicker("novaexchange", CoinPair(asset, currency, pair("marketname").toString), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker("nova", CoinPair(asset, currency, pair("marketname").toString), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }
@@ -35,6 +35,7 @@ object NovaExchange {
 
   def apply(hc: AsyncHttpClient): NovaExchange = new NovaExchange() {
 
+    override val id = 9L
     override val httpClient: AsyncHttpClient = hc
 
   }

@@ -60,8 +60,21 @@ libraryDependencies ++= {
 
 }
 
-jarName in assembly := s"${name.value}.jar"
+//jarName in assembly := s"${name.value}.jar"
+//assemblyMergeStrategy in assembly := {
+//  case PathList("META-INF", xs@_ *) => MergeStrategy.discard
+//  case _ => MergeStrategy.first
+//}
+
+mainClass in assembly := some("network.bundle.ticker.Main")
+assemblyJarName := "bundle-service-ticker-updater.jar"
+
+val meta = """META.INF(.)*""".r
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs@_ *) => MergeStrategy.discard
-  case _ => MergeStrategy.first
+  case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
+  case n if n.startsWith("reference.conf") => MergeStrategy.concat
+  case n if n.endsWith(".conf") => MergeStrategy.concat
+  case meta(_) => MergeStrategy.discard
+  case x => MergeStrategy.first
 }

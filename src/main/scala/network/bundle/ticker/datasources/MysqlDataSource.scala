@@ -17,6 +17,8 @@ object MysqlDataSource {
 
     val maxConnections = Some(config.getInt("data-source.mysql.maxConnections"))
 
+    Class.forName("com.mysql.cj.jdbc.Driver")
+
     val ds = new HikariDataSource()
     ds.setJdbcUrl(config.getString("data-source.mysql.jdbcUrl"))
     ds.setUsername(config.getString("data-source.mysql.username"))

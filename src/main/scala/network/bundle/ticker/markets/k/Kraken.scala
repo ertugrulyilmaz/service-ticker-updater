@@ -68,6 +68,7 @@ object Kraken {
 
   def apply(hc: AsyncHttpClient): Kraken = new Kraken() {
 
+    override val id = 7L
     override val httpClient: AsyncHttpClient = hc
 
   }

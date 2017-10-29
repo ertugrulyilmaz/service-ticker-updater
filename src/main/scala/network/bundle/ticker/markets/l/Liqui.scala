@@ -51,6 +51,7 @@ object Liqui {
 
   def apply(hc: AsyncHttpClient): Liqui = new Liqui() {
 
+    override val id = 8L
     override val httpClient: AsyncHttpClient = hc
 
   }

@@ -14,7 +14,7 @@ object HttpClientFactory {
   def create(): AsyncHttpClient = {
     val userAgent = Random.nextInt(Int.MaxValue) + "- " + GOOGLE
     val asyncConfig: AsyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-      .addRequestFilter(new CustomThrottleRequestFilter(8))
+      .addRequestFilter(new CustomThrottleRequestFilter(10))
       .setMaxRedirects(2)
       .setFollowRedirect(true)
       .setAllowPoolingConnections(true)

@@ -41,6 +41,7 @@ object Gemini {
 
   def apply(hc: AsyncHttpClient): Gemini = new Gemini() {
 
+    override val id = 5L
     override val httpClient: AsyncHttpClient = hc
 
   }

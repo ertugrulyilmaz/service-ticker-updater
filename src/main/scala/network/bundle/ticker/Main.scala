@@ -9,22 +9,21 @@ import com.typesafe.scalalogging.StrictLogging
 import network.bundle.ticker.actors.CoinActor
 import network.bundle.ticker.async.HttpClientFactory
 import network.bundle.ticker.datasources.MysqlDataSource
-import network.bundle.ticker.markets.b.{Binance, Bitfinex, Bittirex}
+import network.bundle.ticker.markets.b.{Binance, Bitfinex, Bittrex}
 import network.bundle.ticker.markets.g.Gemini
 import network.bundle.ticker.markets.h.Hitbtc
 import network.bundle.ticker.markets.k.Kraken
 import network.bundle.ticker.markets.l.Liqui
 import network.bundle.ticker.markets.n.NovaExchange
 import network.bundle.ticker.markets.p.Poloniex
-import network.bundle.ticker.markets.y.Yobit
-import network.bundle.ticker.models.Model.{CoinTicker, Market}
+import network.bundle.ticker.models.Model.{CoinTicker, Increase, Market}
 import network.bundle.ticker.models.Tables.Coin
 import network.bundle.ticker.services.CoinService
 
 import scala.collection.immutable
 import scala.util.{Failure, Success}
 
-object Main extends App with StrictLogging {
+object Main extends StrictLogging {
 
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
@@ -51,35 +50,47 @@ object Main extends App with StrictLogging {
     coinTicker.pair.currency == "btc" && coinTicker.lastPrice > 0 && coinTicker.volume > 0
   }
 
-  val markets = immutable.Seq(
-    Market(Poloniex(httpClient)),
-    Market(Binance(httpClient)),
-    Market(Liqui(httpClient)),
-    Market(Kraken(httpClient)),
-    Market(Hitbtc(httpClient)),
-    Market(Bittirex(httpClient)),
-    Market(Gemini(httpClient)),
-    Market(Bitfinex(httpClient)),
-    Market(NovaExchange(httpClient)),
-    Market(Yobit(httpClient))
-  )
+  def main(args: Array[String]): Unit = {
+    logger.info("args = {}", args)
 
-  Source(markets)
-    .mapAsync(1)(_.market.values())
-    .mapConcat(identity)
-    .filter(isValidTicker)
-    .runFold(Map.empty[String, BigDecimal])(runFold)
-    .onComplete {
-      case Success(result) =>
-        result
-          .foreach { data =>
-            val assetCurrency = data._1.split("-")
-
-            coinActor ! Coin(assetCurrency.head, data._2, Calendar.getInstance().getTimeInMillis)
-          }
-      case Failure(cause) =>
-        logger.error("Failed", cause)
-        system.terminate().onComplete(_ => System.exit(1))
+    val markets = immutable.Seq(
+      Market(Poloniex(httpClient)),
+      Market(Binance(httpClient)),
+      Market(NovaExchange(httpClient)),
+      Market(Kraken(httpClient)),
+      Market(Hitbtc(httpClient)),
+      Market(Bittrex(httpClient)),
+      Market(Gemini(httpClient)),
+      Market(Bitfinex(httpClient)),
+      Market(Liqui(httpClient))
+    ).filter { m =>
+      if (args.length != 0) {
+        m.market.id == args(0).toInt
+       } else {
+        m.market.id > 0
+      }
     }
+
+    Source(markets)
+      .mapAsync(5)(_.market.values())
+      .mapConcat(identity)
+      .filter(isValidTicker)
+      .runFold(Map.empty[String, BigDecimal])(runFold)
+      .onComplete {
+        case Success(result) =>
+
+
+          result
+            .foreach { data =>
+              val assetCurrency = data._1.split("-")
+
+              coinActor ! Increase
+              coinActor ! Coin(assetCurrency.head, data._2, Calendar.getInstance().getTimeInMillis)
+            }
+        case Failure(cause) =>
+          logger.error("Failed", cause)
+          system.terminate().onComplete(_ => System.exit(1))
+      }
+  }
 
 }

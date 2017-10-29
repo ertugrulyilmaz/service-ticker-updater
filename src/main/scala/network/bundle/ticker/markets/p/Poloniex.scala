@@ -40,6 +40,7 @@ object Poloniex {
 
   def apply(hc: AsyncHttpClient): Poloniex = new Poloniex() {
 
+    override val id = 10L
     override val httpClient: AsyncHttpClient = hc
 
   }

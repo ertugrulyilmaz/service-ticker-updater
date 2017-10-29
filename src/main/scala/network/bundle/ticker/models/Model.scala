@@ -15,4 +15,7 @@ object Model {
 
   case class Tickers(coinPair: CoinPair, url: String)
 
+  case object Increase
+  case object Decrease
+
 }

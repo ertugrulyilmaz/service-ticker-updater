@@ -48,6 +48,7 @@ object Hitbtc {
 
   def apply(hc: AsyncHttpClient): Hitbtc = new Hitbtc() {
 
+    override val id = 6L
     override val httpClient: AsyncHttpClient = hc
 
   }

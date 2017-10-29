@@ -74,6 +74,7 @@ object Binance {
 
   def apply(hc: AsyncHttpClient): Binance = new Binance() {
 
+    override val id = 1L
     override val httpClient: AsyncHttpClient = hc
 
   }

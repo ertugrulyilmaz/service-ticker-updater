@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @see https://bittrex.com/Home/Api
   * @see https://bittrex.com/api/v1.1/public/getmarketsummaries
   */
-trait Bittirex extends BaseMarket {
+trait Bittrex extends BaseMarket {
 
   val url = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 
@@ -31,17 +31,18 @@ trait Bittirex extends BaseMarket {
           val volume = pair("Volume").toString
           val lastPrice = pair("Last").toString
 
-          CoinTicker("bittirex", CoinPair(asset, currency, pair("MarketName").toString), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker("bittrex", CoinPair(asset, currency, pair("MarketName").toString), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }
 
 }
 
-object Bittirex {
+object Bittrex {
 
-  def apply(hc: AsyncHttpClient): Bittirex = new Bittirex() {
+  def apply(hc: AsyncHttpClient): Bittrex = new Bittrex() {
 
+    override val id = 3L
     override val httpClient: AsyncHttpClient = hc
 
   }

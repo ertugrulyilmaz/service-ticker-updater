@@ -36,7 +36,7 @@ trait ExchangeCoinRepository extends StrictLogging {
           """
 
     dataSource.db.run(insertAction).onComplete {
-      case Success(_) => logger.info("{}", exchangeCoin)
+      case Success(_) => logger.debug("{}", exchangeCoin)
       case Failure(ex) => logger.error("{} {}", exchangeCoin, ex)
     }
   }
