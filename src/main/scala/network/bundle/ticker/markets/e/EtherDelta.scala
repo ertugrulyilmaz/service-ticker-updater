@@ -18,7 +18,7 @@ trait EtherDelta extends BaseMarket {
 
   val url = "https://cache1.etherdelta.com/nonce/d13121ea535baa4a4e9113a23fee40e19cff517d92039f028a3ff9d69ea0a679/returnTicker"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -29,7 +29,7 @@ trait EtherDelta extends BaseMarket {
         val volume = pair._2("quoteVolume").toString
         val lastPrice = pair._2("last").toString
 
-        CoinTicker("etherdelta", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }.to[immutable.Seq]
     }
   }

@@ -18,13 +18,13 @@ trait Btcc extends BaseMarket {
 
   val url = "https://spotusd-data.btcc.com/data/pro/ticker?symbol=BTCUSD"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Any]]]("ticker")
       val volume = data.getOrElse("Volume24H", "0.0").toString
       val lastPrice = data.getOrElse("Last", "0.0").toString
 
-      immutable.Seq(CoinTicker("btcc", CoinPair("btc", "usd"), BigDecimal(volume), BigDecimal(lastPrice)))
+      immutable.Seq(CoinTicker(id, CoinPair("btc", "usd"), BigDecimal(volume), BigDecimal(lastPrice)))
     }
   }
 

@@ -19,7 +19,7 @@ trait Gdax extends BaseMarket {
 
   val url = "https://api-public.sandbox.gdax.com/products"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     val resProducts = HttpClientFactory.completedGet(httpClient, url)
 
     val products = parse(resProducts.getResponseBody).values.asInstanceOf[immutable.Seq[Map[String, String]]]
@@ -34,7 +34,7 @@ trait Gdax extends BaseMarket {
         val volume = data.getOrElse("volume", 0.0).toString
         val lastPrice = data.getOrElse("price", 0.0).toString
 
-        CoinTicker("gdax", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

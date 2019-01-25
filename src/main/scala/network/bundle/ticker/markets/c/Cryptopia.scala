@@ -18,7 +18,7 @@ trait Cryptopia extends BaseMarket {
 
   val url = "https://www.cryptopia.co.nz/api/GetMarkets"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -29,7 +29,7 @@ trait Cryptopia extends BaseMarket {
         val volume = pair("Volume").toString
         val lastPrice = pair("LastPrice").toString
 
-        CoinTicker("cryptopia", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

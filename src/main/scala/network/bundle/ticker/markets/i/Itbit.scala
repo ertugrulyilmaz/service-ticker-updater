@@ -22,14 +22,14 @@ trait Itbit extends BaseMarket {
     Tickers(CoinPair("xbt", "eur"), "https://api.itbit.com/v1/markets/XBTEUR/ticker")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, String]]
         val volume = data.getOrElse("volume24h", "0.0")
         val lastPrice = data.getOrElse("lastPrice", "0.0")
 
-        CoinTicker("itbit", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

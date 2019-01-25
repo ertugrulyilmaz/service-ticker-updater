@@ -19,7 +19,7 @@ trait Btc38 extends BaseMarket {
 
   val url = "http://api.btc38.com/v1/ticker.php?c=all&mk_type=cny"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -32,7 +32,7 @@ trait Btc38 extends BaseMarket {
           val volume = data.getOrElse("vol", 0.0)
           val lastPrice = data.getOrElse("last", 0.0)
 
-          CoinTicker("btc38", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

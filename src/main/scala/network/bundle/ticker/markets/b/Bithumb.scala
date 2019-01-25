@@ -20,7 +20,7 @@ trait Bithumb extends BaseMarket {
 
   val url = "https://api.bithumb.com/public/ticker/all"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody).values
         .asInstanceOf[Map[String, Any]]("data")
@@ -32,7 +32,7 @@ trait Bithumb extends BaseMarket {
           val volume = m._2("volume_1day")
           val lastPrice = m._2("buy_price")
 
-          CoinTicker("bithumb", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

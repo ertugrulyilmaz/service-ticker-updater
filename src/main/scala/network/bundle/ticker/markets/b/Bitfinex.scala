@@ -3,11 +3,12 @@ package network.bundle.ticker.markets.b
 import com.ning.http.client.AsyncHttpClient
 import network.bundle.ticker.async.HttpClientFactory
 import network.bundle.ticker.markets.BaseMarket
-import network.bundle.ticker.models.Model.{CoinPair, CoinTicker}
+import network.bundle.ticker.models.Model._
 import org.json4s.jackson.JsonMethods._
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.BigDecimal.RoundingMode
 
 /**
   * @note Market Api Informations
@@ -20,38 +21,62 @@ import scala.concurrent.{ExecutionContext, Future}
   **/
 trait Bitfinex extends BaseMarket {
 
-  val baseUrl: String = "https://api.bitfinex.com/v1/pubticker"
-  val coinPairs: immutable.Seq[CoinPair] = immutable.Seq(
-    CoinPair("btc", "usd", "btcusd"),
-    CoinPair("ltc", "usd", "ltcusd"), CoinPair("ltc", "btc", "ltcbtc"),
-    CoinPair("eth", "usd", "ethusd"), CoinPair("eth", "btc", "ethbtc"),
-    CoinPair("etc", "btc", "etcbtc"), CoinPair("etc", "usd", "etcusd"),
-    CoinPair("rrt", "usd", "rrtusd"), CoinPair("rrt", "btc", "rrtbtc"),
-    CoinPair("zec", "usd", "zecusd"), CoinPair("zec", "btc", "zecbtc"),
-    CoinPair("xmr", "usd", "xmrusd"), CoinPair("xmr", "btc", "xmrbtc"),
-    CoinPair("dsh", "usd", "dshusd"), CoinPair("dsh", "btc", "dshbtc"),
-    CoinPair("bcc", "btc", "bccbtc"), CoinPair("bcc", "usd", "bccusd"),
-    CoinPair("bcu", "btc", "bcubtc"), CoinPair("bcu", "usd", "bcuusd"),
-    CoinPair("xrp", "usd", "xrpusd"), CoinPair("xrp", "btc", "xrpbtc"),
-    CoinPair("iot", "usd", "iotusd"), CoinPair("iot", "btc", "iotbtc"), CoinPair("iot", "eth", "ioteth"),
-    CoinPair("eos", "usd", "eosusd"), CoinPair("eos", "btc", "eosbtc"), CoinPair("eos", "eth", "eoseth"),
-    CoinPair("san", "usd", "sanusd"), CoinPair("san", "btc", "sanbtc"), CoinPair("san", "eth", "saneth"),
-    CoinPair("omg", "usd", "omgusd"), CoinPair("omg", "btc", "omgbtc"), CoinPair("omg", "eth", "omgeth"),
-    CoinPair("bch", "usd", "bchusd"), CoinPair("bch", "btc", "bchbtc"), CoinPair("bch", "eth", "bcheth"),
-    CoinPair("neo", "usd", "neousd"), CoinPair("neo", "btc", "neobtc"), CoinPair("neo", "eth", "neoeth"),
-    CoinPair("etp", "usd", "etpusd"), CoinPair("etp", "btc", "etpbtc"), CoinPair("etp", "eth", "etpeth"),
-    CoinPair("qtm", "usd", "qtmusd"), CoinPair("qtm", "btc", "qtmbtc"), CoinPair("qtm", "eth", "qtmeth"),
-    CoinPair("avt", "usd", "avtusd"), CoinPair("avt", "btc", "avtbtc"), CoinPair("avt", "eth", "avteth")
-  ).filter(_.currency == "btc")
+  val TICKER_URL: String = "https://api.bitfinex.com/v1/pubticker"
+  val ORDER_URL: String = "https://api.bitfinex.com/v1/book"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  val coinPairs: immutable.Seq[CoinPair] = immutable.Seq(
+    CoinPair("ltc", "btc","ltcbtc"),
+    CoinPair("eth", "btc","ethbtc"),
+    CoinPair("xmr", "btc","xmrbtc"),
+    CoinPair("xrp", "btc","xrpbtc"),
+    CoinPair("iot", "btc","iotbtc"),
+    CoinPair("eos", "btc","eosbtc"),
+    CoinPair("bch", "btc","bchbtc"),
+    CoinPair("neo", "btc","neobtc")
+  )
+
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(coinPairs) { coinPair =>
-      val url = s"$baseUrl/${coinPair.asset}${coinPair.currency}"
+      val url = s"$TICKER_URL/${coinPair.asset}${coinPair.currency}"
+
       HttpClientFactory.get(httpClient, url).map { response =>
         val data = parse(response.getResponseBody).values.asInstanceOf[Map[String, String]]
+        logger.info("{} - {}", url, data)
         val volume = data("volume")
         val lastPrice = data("last_price")
-        CoinTicker("bitfinex", coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+      }
+    }
+  }
+
+  override def orders()(implicit ec: ExecutionContext): Future[immutable.Seq[ExchangeCoinOrders]] = {
+    Future.traverse(coinPairs) { coinPair =>
+      val url = s"$ORDER_URL/${coinPair.asset}${coinPair.currency}"
+
+      HttpClientFactory.get(httpClient, url).map { response =>
+        val data = parse(response.getResponseBody).values.asInstanceOf[Map[String, Seq[Map[String, String]]]]
+
+        val bids = data.getOrElse("bids", Seq.empty[Map[String, String]])
+          .map { bid =>
+            val price = bid.getOrElse("price", "0.0")
+            val amount = bid.getOrElse("amount", "0.0")
+
+            Order(BigDecimal(price).setScale(8, RoundingMode.HALF_UP), BigDecimal(amount).setScale(8, RoundingMode.HALF_UP))
+          }
+          .filter(_.amount > 0)
+          .take(ORDER_LIMIT)
+
+        val asks = data.getOrElse("asks", Seq.empty[Map[String, String]])
+          .map { bid =>
+            val price = bid.getOrElse("price", "0.0")
+            val amount = bid.getOrElse("amount", "0.0")
+
+            Order(BigDecimal(price).setScale(8, RoundingMode.HALF_UP), BigDecimal(amount).setScale(8, RoundingMode.HALF_UP))
+          }
+          .filter(_.amount > 0)
+          .take(ORDER_LIMIT)
+
+        ExchangeCoinOrders(id, CoinOrder(coinPair, bids), CoinOrder(coinPair, asks))
       }
     }
   }

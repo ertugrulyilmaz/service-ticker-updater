@@ -13,7 +13,7 @@ trait NovaExchange extends BaseMarket {
 
   val url = "https://novaexchange.com/remote/v2/markets/"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values.asInstanceOf[Map[String, List[Map[String, Any]]]]("markets")
@@ -24,7 +24,7 @@ trait NovaExchange extends BaseMarket {
           val volume = pair("volume24h").toString
           val lastPrice = pair("last_price").toString
 
-          CoinTicker("nova", CoinPair(asset, currency, pair("marketname").toString), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency, pair("marketname").toString), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }

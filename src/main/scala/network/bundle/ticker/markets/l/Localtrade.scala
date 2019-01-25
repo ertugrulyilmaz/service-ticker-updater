@@ -19,11 +19,11 @@ trait Localtrade extends BaseMarket {
 
   val url = "https://localtrade.pro/trade"
 
-  val ids = immutable.Seq(2, 3, 4, 6, 7, 8, 9, 10, 11, 14, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27)
+  val marketIds = immutable.Seq(2, 3, 4, 6, 7, 8, 9, 10, 11, 14, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27)
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
-    Future.traverse(ids) { id =>
-      HttpClientFactory.get(httpClient, s"$url/$id/").map { res =>
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+    Future.traverse(marketIds) { marketId =>
+      HttpClientFactory.get(httpClient, s"$url/$marketId/").map { res =>
         val doc = Jsoup.parse(res.getResponseBodyAsStream, "utf-8", "https://localtrade.pro")
         val pair = doc.select("div.mtrade__tradepair > a.active").text().toLowerCase.split(" / ")
         val asset = pair.head
@@ -31,7 +31,7 @@ trait Localtrade extends BaseMarket {
         val volume = doc.select(".b_graph__vars-item_val > span").text()
         val lastPrice = doc.select(".b_graph__vars-item_last > span").text()
 
-        CoinTicker("localtrade", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

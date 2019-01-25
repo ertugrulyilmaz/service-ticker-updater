@@ -21,7 +21,7 @@ trait Zaif extends BaseMarket {
   val pairUrl = "https://api.zaif.jp/api/1/currency_pairs/all"
   val tickerUrl = "https://api.zaif.jp/api/1/ticker"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     val res = HttpClientFactory.completedGet(httpClient, pairUrl)
     val vals = parse(res.getResponseBody)
       .values
@@ -37,7 +37,7 @@ trait Zaif extends BaseMarket {
         val volume = data.getOrElse("volume", 0.0)
         val lastPrice = data.getOrElse("last", 0.0)
 
-        CoinTicker("zaif", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

@@ -19,7 +19,7 @@ trait Jubi extends BaseMarket {
 
   val url = "https://www.jubi.com/api/v1/allticker/"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -29,7 +29,7 @@ trait Jubi extends BaseMarket {
           val volume = data._2("volume").toString
           val lastPrice = data._2("last").toString
 
-          CoinTicker("jubi", CoinPair(asset, "cny"), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, "cny"), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

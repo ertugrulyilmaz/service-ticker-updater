@@ -6,7 +6,6 @@
         </encoder>
     </appender>
 
-    <logger name="com.acoindb.ticker" level="INFO" />
     <logger name="com.ning.http.client" level="INFO" />
 
     <root level="INFO">

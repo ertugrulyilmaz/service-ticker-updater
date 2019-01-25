@@ -18,7 +18,7 @@ trait CoinService extends StrictLogging {
   val coinRepository: CoinRepository
 
   def saveExchange(ct: CoinTicker)(implicit executionContext: ExecutionContext): Unit = {
-    val ec = ExchangeCoin(ct.exchange, ct.pair.market, ct.pair.asset, ct.pair.currency, ct.lastPrice.setScale(8, RoundingMode.HALF_DOWN), ct.volume.setScale(8, RoundingMode.HALF_DOWN), Calendar.getInstance().getTimeInMillis)
+    val ec = ExchangeCoin(ct.exchangeId, ct.pair.market, ct.pair.asset, ct.pair.currency, ct.lastPrice.setScale(8, RoundingMode.HALF_DOWN), ct.volume.setScale(8, RoundingMode.HALF_DOWN), Calendar.getInstance().getTimeInMillis)
     exchangeCoinRepository.save(ec)
   }
 

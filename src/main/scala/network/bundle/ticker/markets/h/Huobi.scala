@@ -23,21 +23,23 @@ import scala.concurrent.{ExecutionContext, Future}
 trait Huobi extends BaseMarket {
 
   val tickers: immutable.Seq[Tickers] = immutable.Seq(
-    Tickers(CoinPair("etc", "cny"), "https://be.huobi.com/market/detail?symbol=etccny"),
-    Tickers(CoinPair("eth", "cny"), "https://be.huobi.com/market/detail?symbol=ethcny"),
     Tickers(CoinPair("ltc", "btc"), "http://api.huobi.pro/market/detail?symbol=ltcbtc"),
+    Tickers(CoinPair("eos", "btc"), "http://api.huobi.pro/market/detail?symbol=eosbtc"),
     Tickers(CoinPair("eth", "btc"), "http://api.huobi.pro/market/detail?symbol=ethbtc"),
+    Tickers(CoinPair("xrp", "btc"), "http://api.huobi.pro/market/detail?symbol=xrpbtc"),
+    Tickers(CoinPair("neo", "btc"), "http://api.huobi.pro/market/detail?symbol=neobtc"),
+    Tickers(CoinPair("bch", "btc"), "http://api.huobi.pro/market/detail?symbol=bchbtc"),
     Tickers(CoinPair("etc", "btc"), "http://api.huobi.pro/market/detail?symbol=etcbtc")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Double]]]("tick")
         val volume = data("vol")
         val lastPrice = data("open")
 
-        CoinTicker("huobi", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }
@@ -48,6 +50,7 @@ object Huobi {
 
   def apply(hc: AsyncHttpClient): Huobi = new Huobi() {
 
+    override val id = 11L
     override val httpClient: AsyncHttpClient = hc
 
   }

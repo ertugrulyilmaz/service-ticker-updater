@@ -28,14 +28,14 @@ trait Korbit extends BaseMarket {
     Tickers(CoinPair("xrp", "krw"), "https://api.korbit.co.kr/v1/ticker/detailed?currency_pair=xrp_krw")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, String]]
         val volume = data.getOrElse("volume", "0.0")
         val lastPrice = data.getOrElse("last", "0.0")
 
-        CoinTicker("korbit", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

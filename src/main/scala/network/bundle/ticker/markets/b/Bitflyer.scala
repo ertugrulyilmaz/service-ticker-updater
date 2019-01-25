@@ -24,14 +24,14 @@ trait Bitflyer extends BaseMarket {
     Tickers(CoinPair("eth", "btc"), "https://api.bitflyer.jp/v1/ticker?product_code=ETH_BTC")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Double]]]("data")
         val volume = data("volume")
         val lastPrice = data("best_bid")
 
-        CoinTicker("bitflyer", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

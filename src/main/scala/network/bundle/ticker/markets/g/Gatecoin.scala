@@ -18,7 +18,7 @@ trait Gatecoin extends BaseMarket {
 
   val url = "https://api.gatecoin.com/Public/LiveTickers"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -35,7 +35,7 @@ trait Gatecoin extends BaseMarket {
           val volume = ticker("volume").toString
           val lastPrice = ticker("last").toString
 
-          CoinTicker("gatecoin", coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, coinPair, BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }

@@ -16,10 +16,10 @@ trait ExchangeCoinRepository extends StrictLogging {
     val insertAction =
       sqlu"""
          INSERT INTO exchange_coin
-             (exchange, market, asset, currency, price, volume, updated_at)
+             (exchange_id, market, asset, currency, price, volume, updated_at)
          VALUES
              (
-              ${exchangeCoin.exchange},
+              ${exchangeCoin.exchangeId},
               ${exchangeCoin.market},
               ${exchangeCoin.asset},
               ${exchangeCoin.currency},

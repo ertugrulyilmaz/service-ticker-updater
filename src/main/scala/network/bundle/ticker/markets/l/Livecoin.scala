@@ -19,7 +19,7 @@ trait Livecoin extends BaseMarket {
 
   val url = "https://api.livecoin.net/exchange/ticker"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody).values.asInstanceOf[List[Map[String, Any]]]
         .map { pair =>
@@ -29,7 +29,7 @@ trait Livecoin extends BaseMarket {
           val volume = pair("volume").toString
           val lastPrice = pair("last").toString
 
-          CoinTicker("livecoin", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }

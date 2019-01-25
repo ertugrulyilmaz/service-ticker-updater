@@ -18,7 +18,7 @@ trait Cex extends BaseMarket {
 
   val url = "https://cex.io/api/tickers/USD/EUR/RUB/BTC"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -29,7 +29,7 @@ trait Cex extends BaseMarket {
         val volume = pair("volume").toString
         val lastPrice = pair("last").toString
 
-        CoinTicker("cex", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

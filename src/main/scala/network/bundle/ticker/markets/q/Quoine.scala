@@ -19,7 +19,7 @@ trait Quoine extends BaseMarket {
 
   val url = "https://api.quoine.com/products"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -30,7 +30,7 @@ trait Quoine extends BaseMarket {
           val volume = pair("volume_24h").toString
           val lastPrice = pair("last_price_24h").toString
 
-          CoinTicker("quoine", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
         }
     }
   }

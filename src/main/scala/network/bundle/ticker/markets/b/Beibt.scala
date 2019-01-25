@@ -19,7 +19,7 @@ trait Beibt extends BaseMarket {
 
   val url = "http://beibt.com/Index/CurrencyList.html"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody).values.asInstanceOf[List[Map[String, Any]]].map { data =>
         val asset = if (data("currency_mark").toString.trim != "") data("currency_mark").toString.toLowerCase else data("currency_name").toString.toLowerCase
@@ -27,7 +27,7 @@ trait Beibt extends BaseMarket {
         val volume = data("24H_done_money").toString.replace("万", "")
         val lastPrice = data("buy_one_price").toString
 
-        CoinTicker("beibt", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

@@ -35,14 +35,14 @@ trait Chbtc extends BaseMarket {
     Tickers(CoinPair("qtum", "cny"), "http://api.chbtc.com/data/v1/ticker?currency=qtum_cny")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, String]]]("ticker")
         val volume = data("vol")
         val lastPrice = data("last")
 
-        CoinTicker("chbtc", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

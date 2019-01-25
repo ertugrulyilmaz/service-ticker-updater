@@ -27,14 +27,14 @@ trait Coinsbank extends BaseMarket {
     Tickers(CoinPair("ltc", "gbp"), "https://coinsbank.com/api/public/ticker?pair=LTCGBP")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Any]]]("data")
         val volume = data.getOrElse("volume", "0.0").toString
         val lastPrice = data.getOrElse("last", "0.0").toString
 
-        CoinTicker("coinsbank", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

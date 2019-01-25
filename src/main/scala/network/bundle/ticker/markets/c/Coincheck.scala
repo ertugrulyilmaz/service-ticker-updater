@@ -18,13 +18,13 @@ trait Coincheck extends BaseMarket {
 
   val url = "https://coincheck.com/api/ticker"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Double]]
       val volume = data("volume")
       val lastPrice = data("last")
 
-      immutable.Seq(CoinTicker("coincheck", CoinPair("btc", "btc"), BigDecimal(volume), BigDecimal(lastPrice)))
+      immutable.Seq(CoinTicker(id, CoinPair("btc", "btc"), BigDecimal(volume), BigDecimal(lastPrice)))
     }
   }
 }

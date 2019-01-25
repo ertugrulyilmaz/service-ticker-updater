@@ -29,7 +29,7 @@ trait Btctrade extends BaseMarket {
     Tickers(CoinPair("ybc", "btc"), "https://m.btctrade.com/coin/rmb/ybc/order.js")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     val epoxtime = Calendar.getInstance().getTimeInMillis / 1000
 
     Future.traverse(tickers) { ticker =>
@@ -38,7 +38,7 @@ trait Btctrade extends BaseMarket {
         val volume = data("sum").toString
         val lastPrice = data("d").asInstanceOf[List[Map[String, Any]]].last("p").toString
 
-        CoinTicker("btctrade", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

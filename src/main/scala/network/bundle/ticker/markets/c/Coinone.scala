@@ -19,7 +19,7 @@ trait Coinone extends BaseMarket {
 
   val url = "https://api.coinone.co.kr/ticker/?currency=all"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -32,7 +32,7 @@ trait Coinone extends BaseMarket {
           val volume = pair._2("volume")
           val lastPrice = pair._2("last")
 
-          CoinTicker("coinone", CoinPair(asset, "btc"), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, "btc"), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

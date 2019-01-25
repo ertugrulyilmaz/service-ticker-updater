@@ -20,7 +20,7 @@ trait Yunbi extends BaseMarket {
 
   val url = "https://yunbi.com/api/v2/tickers.json"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Map[String, String]]]]
         .map { pair =>
@@ -28,7 +28,7 @@ trait Yunbi extends BaseMarket {
           val volume = data("vol")
           val lastPrice = data("last")
 
-          CoinTicker("yunbi", CoinPair(pair._1.replace("cny", ""), "cny"), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(pair._1.replace("cny", ""), "cny"), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

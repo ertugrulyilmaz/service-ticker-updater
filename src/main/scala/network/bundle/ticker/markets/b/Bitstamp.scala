@@ -31,14 +31,14 @@ trait Bitstamp extends BaseMarket {
     Tickers(CoinPair("ltc", "btc"), "https://www.bitstamp.net/api/v2/ticker/ltcbtc")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, String]]
         val volume = data("volume")
         val lastPrice = data("last")
 
-        CoinTicker("bitstamp", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

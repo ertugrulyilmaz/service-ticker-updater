@@ -1,7 +1,6 @@
 
 name := "bundle-service-ticker-updater"
 
-
 version := "1.0"
 
 scalaVersion := "2.12.2"
@@ -37,6 +36,7 @@ libraryDependencies ++= {
   val mysqlV = "6.0.6"
   val jsoupV = "1.8.3"
   val dynamodbV = "1.11.179"
+  val redisV = "1.8.0"
 
   Seq(
     "com.amazonaws" % "aws-java-sdk-dynamodb" % dynamodbV,
@@ -46,6 +46,8 @@ libraryDependencies ++= {
     "com.ning" % "async-http-client" % ningV,
 
     "org.json4s" %% "json4s-jackson" % json4sV,
+
+    "com.github.etaty" %% "rediscala" % redisV,
 
     "com.typesafe.slick" %% "slick" % slickV,
     "mysql" % "mysql-connector-java" % mysqlV,
@@ -60,13 +62,7 @@ libraryDependencies ++= {
 
 }
 
-//jarName in assembly := s"${name.value}.jar"
-//assemblyMergeStrategy in assembly := {
-//  case PathList("META-INF", xs@_ *) => MergeStrategy.discard
-//  case _ => MergeStrategy.first
-//}
-
-mainClass in assembly := some("network.bundle.ticker.Main")
+//mainClass in assembly := some("network.bundle.ticker.Main")
 assemblyJarName := "bundle-service-ticker-updater.jar"
 
 val meta = """META.INF(.)*""".r

@@ -20,7 +20,7 @@ trait Szzc extends BaseMarket {
 
   val url = "https://szzc.com/api/public/tickers"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -30,7 +30,7 @@ trait Szzc extends BaseMarket {
           val volume = BigDecimal(pair("vol24h").toString) * BigDecimal(0.00000001)
           val lastPrice = BigDecimal(pair("last24h").toString) * BigDecimal(0.00000001)
 
-          CoinTicker("szzc", CoinPair(asset, "cny"), volume, lastPrice)
+          CoinTicker(id, CoinPair(asset, "cny"), volume, lastPrice)
         }
     }
   }

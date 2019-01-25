@@ -21,7 +21,7 @@ trait Bter extends BaseMarket {
 
   val url = "http://data.bter.com/api2/1/tickers"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody)
         .values
@@ -33,7 +33,7 @@ trait Bter extends BaseMarket {
           val lastPrice = data._2("last").toString
           val volume = data._2("quoteVolume").toString
 
-          CoinTicker("bter", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice))
         }.to[immutable.Seq]
     }
   }

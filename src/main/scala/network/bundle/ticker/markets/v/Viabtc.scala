@@ -25,14 +25,14 @@ trait Viabtc extends BaseMarket {
     Tickers(CoinPair("zec", "cny"), "https://www.viabtc.com/api/v1/market/ticker?market=ZECCNY")
   )
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     Future.traverse(tickers) { ticker =>
       HttpClientFactory.get(httpClient, ticker.url).map { res =>
         val data = parse(res.getResponseBody).values.asInstanceOf[Map[String, Map[String, Map[String, String]]]]("data")("ticker")
         val volume = data("vol")
         val lastPrice = data("last")
 
-        CoinTicker("viabtc", ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
+        CoinTicker(id, ticker.coinPair, BigDecimal(volume), BigDecimal(lastPrice))
       }
     }
   }

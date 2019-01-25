@@ -1,20 +1,22 @@
 package network.bundle.ticker.async
 
 import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, AsyncHttpClientConfig, Response}
+import com.typesafe.scalalogging.StrictLogging
+import network.bundle.ticker.models.Model.ThrottleRequestFilter
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Random
 
-object HttpClientFactory {
+object HttpClientFactory extends StrictLogging {
 
   val CONTENT_TYPE: String = "Content-Type"
   val APPLICATION_JSON: String = "application/json; charset=utf-8"
   val GOOGLE = "Mozilla/5.0 (compatible; googlebot2/2.0; +http://www.bing.com/bingbot2.htm)"
 
-  def create(): AsyncHttpClient = {
+  def create(throttleRequestFilterMap: Map[String, ThrottleRequestFilter]): AsyncHttpClient = {
     val userAgent = Random.nextInt(Int.MaxValue) + "- " + GOOGLE
     val asyncConfig: AsyncHttpClientConfig = new AsyncHttpClientConfig.Builder()
-      .addRequestFilter(new CustomThrottleRequestFilter(10))
+      .addRequestFilter(new CustomThrottleRequestFilter(throttleRequestFilterMap))
       .setMaxRedirects(2)
       .setFollowRedirect(true)
       .setAllowPoolingConnections(true)
@@ -33,6 +35,8 @@ object HttpClientFactory {
   }
 
   def get(httpClient: AsyncHttpClient, url: String): Future[Response] = {
+    logger.debug("{}", url)
+
     val promise = Promise[Response]()
 
     httpClient.prepareGet(url).execute(new AsyncCompletionHandler[Response] {

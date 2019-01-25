@@ -18,7 +18,7 @@ trait Bitmex extends BaseMarket {
 
   val url = "https://www.bitmex.com/api/v1/stats"
 
-  override def values()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
+  override def tickers()(implicit ec: ExecutionContext): Future[immutable.Seq[CoinTicker]] = {
     HttpClientFactory.get(httpClient, url).map { res =>
       parse(res.getResponseBody).values
         .asInstanceOf[List[Map[String, Any]]]
@@ -38,7 +38,7 @@ trait Bitmex extends BaseMarket {
           val volume = data._3
           val lastPrice = data._4
 
-          CoinTicker("bitmex", CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice) * BigDecimal(0.00000001))
+          CoinTicker(id, CoinPair(asset, currency), BigDecimal(volume), BigDecimal(lastPrice) * BigDecimal(0.00000001))
         }
     }
   }
